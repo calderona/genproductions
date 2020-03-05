@@ -108,6 +108,7 @@ make_gridpack () {
       #############################################
       #Copy, Unzip and Delete the MadGraph tarball#
       #############################################
+      
       wget --no-check-certificate ${MGSOURCE}
       tar xzf ${MG}
       rm "$MG"
@@ -184,6 +185,8 @@ make_gridpack () {
     
       ./bin/mg5_aMC mgconfigscript
     
+      MODELDIR="ZpHiggs_UFO"
+
       #load extra models if needed
       if [ -e $CARDSDIR/${name}_extramodels.dat ]; then
         echo "Loading extra models specified in $CARDSDIR/${name}_extramodels.dat"
@@ -195,16 +198,18 @@ make_gridpack () {
             echo "Loading extra model $model"
             wget --no-check-certificate https://cms-project-generators.web.cern.ch/cms-project-generators/$model	
             cd models
+	    mkdir $MODELDIR
+	    cd $MODELDIR
             if [[ $model == *".zip"* ]]; then
-              unzip ../$model
+              unzip ../../$model
             elif [[ $model == *".tgz"* ]]; then
-              tar zxvf ../$model
+              tar zxvf ../../$model
             elif [[ $model == *".tar"* ]]; then
-              tar xavf ../$model
+              tar xavf ../../$model
             else 
               echo "A BSM model is specified but it is not in a standard archive (.zip or .tar)"
             fi
-            cd ..
+            cd ../../
           fi
         done
       fi
@@ -339,7 +344,9 @@ make_gridpack () {
           if [ "${BASH_SOURCE[0]}" != "${0}" ]; then return 1; else exit 1; fi
         fi
       fi
-      
+
+
+
       if [ -z ${carddir} ]; then
         echo "Card directory not provided"
         if [ "${BASH_SOURCE[0]}" != "${0}" ]; then return 1; else exit 1; fi
@@ -357,6 +364,10 @@ make_gridpack () {
     
     fi  
     
+    echo "$carddir"
+    echo "$CARDSDIR"
+    echo "$name"
+
     if [ -d gridpack ]; then
       rm -rf gridpack
     fi
